@@ -22,7 +22,7 @@
   }
   
   .darkmode aside {
-    background: #202020;
+    background: #202020 !important;
     color: var(--fg);
   }
   
@@ -34,13 +34,13 @@
   pages/index.astro
   -------------------- */
   .darkmode .read-more-link a {
-    color: var(--fg);
+    color: var(--fg) !important;
   }
   /* --------------------
   posts/[slug].astro
   -------------------- */
   .darkmode .content h1 {
-    color: var(--fg);
+    color: var(--fg) !important;
   }
   
   /* --------------------
@@ -84,6 +84,13 @@
     background: #252525 !important;
   }
   
+    /* --------------------
+  Callout.astro2(default)
+  -------------------- */
+  .darkmode .callout.default {
+    background: #252525 !important;
+  }
+
   /* --------------------
   Code.astro
   -------------------- */
@@ -91,19 +98,19 @@
     background: #272727 !important;
   }
   .darkmode .code pre code {
-    color: var(--fg);
+    color: var(--fg) !important;
     background: #272727 !important;
   }
   .darkmode code {
-    background: #2F2F2D;
+    background: #2F2F2D !important;
   }
   
   .darkmode .code > div {
-    background: #272727;
+    background: #272727 !important;
   }
   
   .darkmode .code button.copy {
-    background-color: rgba(227,226,224,0.2);
+    background-color: rgba(227,226,224,0.2) !important;
   }
   
   /* --------------------
@@ -162,7 +169,7 @@
   PostRelativeLink.astro
   -------------------- */
   .darkmode div.post-relative-link > div > a.colored  {
-    background: rgba(227,226,224,0.1);
+    background: rgba(227,226,224,0.1) !important;
   }
   
   /* --------------------
@@ -170,52 +177,52 @@
   -------------------- */
   .darkmode .tag.default {
     background: #373737 !important;
-    color: #f7f7f7;
+    color: #f7f7f7 !important;
   }
   .darkmode .tag.gray,
   .darkmode .gray-background {
     background: #5a5a5a !important;
-    color: #f7f7f7;
+    color: #f7f7f7 !important;
   }
   .darkmode .tag.brown,
   .darkmode .brown-background {
     background: #603b2c !important;
-    color: #f7f7f7;
+    color: #f7f7f7 !important;
   }
   .darkmode .tag.orange,
   .darkmode .orange-background {
     background: #864C1D !important;
-    color: #f7f7f7;
+    color: #f7f7f7 !important;
   }
   .darkmode .tag.yellow,
   .darkmode .yellow-background {
     background: #8a632a !important;
-    color: #f7f7f7;
+    color: #f7f7f7 !important;
   }
   .darkmode .tag.green,
   .darkmode .green-background {
     background: #2c5940 !important;
-    color: #f7f7f7;
+    color: #f7f7f7 !important;
   }
   .darkmode .tag.blue,
   .darkmode .blue-background {
     background: #28456c !important;
-    color: #f7f7f7;
+    color: #f7f7f7 !important;
   }
   .darkmode .tag.purple,
   .darkmode .purple-background {
     background: #493064 !important;
-    color: #f7f7f7;
+    color: #f7f7f7 !important;
   }
   .darkmode .tag.pink,
   .darkmode .pink-background {
     background: #613047 !important;
-    color: #f7f7f7;
+    color: #f7f7f7 !important;
   }
   .darkmode .tag.red,
   .darkmode .red-background {
     background: #6f3630 !important;
-    color: #f7f7f7;
+    color: #f7f7f7 !important;
   }
   
   /* --------------------
@@ -278,6 +285,7 @@
   </style>
   
   <script is:inline>
+
   /* --------------------
   ダークモード切り替え
   -------------------- */
