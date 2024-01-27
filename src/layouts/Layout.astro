@@ -167,11 +167,20 @@ if (database.Icon && database.Icon.Type === 'file') {
 </html>
 
 <style>
+  /* ヘッダー画像のサイズを調整 */
   .container {
     display: flex;
     min-height: 100vh;
     max-width: 1280px;
     margin: 0 auto;
+  }
+
+  /*CSSの.containerクラス（または該当するクラス）にメディアクエリを追加し、
+  スマートフォンの画面サイズに合わせてコンテナの幅を調整  */
+  @media (max-width: 959px) {
+  .container {
+    display: block;
+    }
   }
 
   .container > div {
