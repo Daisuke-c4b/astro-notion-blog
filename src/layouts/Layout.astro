@@ -79,7 +79,9 @@ if (database.Icon && database.Icon.Type === 'file') {
   <body>
     <GoogleAnalytics trackingId={PUBLIC_GA_TRACKING_ID} />
     <div class="container">
-      <header>
+
+      <!-- headerタグをなくし、mainタグの中にヘッダーを挿入 -->
+      <!-- <header>
         {
           coverImageURL && (
             <div class="cover">
@@ -87,10 +89,18 @@ if (database.Icon && database.Icon.Type === 'file') {
             </div>
           )
         }
-      </header>
+      </header> -->
 
       <div>
         <main>
+          <!-- headerタグの中にあったヘッダー画像をmainタグへ移動 -->
+          {
+            coverImageURL && (
+              <div class="cover">
+                <img src={coverImageURL} alt="Site cover image" loading="lazy" />
+              </div>
+            )
+          }
           <div class="content">
             <header>
               <h1>
@@ -158,7 +168,10 @@ if (database.Icon && database.Icon.Type === 'file') {
 
 <style>
   .container {
+    display: flex;
     min-height: 100vh;
+    max-width: 1280px;
+    margin: 0 auto;
   }
 
   .container > div {
@@ -187,6 +200,9 @@ if (database.Icon && database.Icon.Type === 'file') {
     width: 300px;
     padding: 20px 20px;
     background-color: #f4f4f4;
+    position: sticky;
+    top: 0;
+    height: 100vh
   }
   @media (max-width: 640px) {
     aside {
@@ -200,7 +216,7 @@ if (database.Icon && database.Icon.Type === 'file') {
   div.cover img {
     display: block;
     width: 100%;
-    height: 20vh;
+    height: auto;
     object-fit: cover;
     object-position: center 60%;
   }
