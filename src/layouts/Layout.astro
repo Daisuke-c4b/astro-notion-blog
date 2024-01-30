@@ -69,6 +69,10 @@ if (database.Icon && database.Icon.Type === 'file') {
     <meta name="twitter:description" content={siteDescription} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={ogImage || siteOGImage} />
+    <!-- Google Fontsより追加 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Zen+Maru+Gothic:wght@500&display=swap" rel="stylesheet">
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
@@ -384,10 +388,13 @@ if (database.Icon && database.Icon.Type === 'file') {
     min-height: 100vh;
     background: var(--bg);
     color: var(--fg);
-    font-family: Tsukushi A Round Gothic, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    /* Google Fontsより追加 */
+    font-family: 'Noto Sans JP', sans-serif;
+    font-family: 'Zen Maru Gothic', serif;
+    /* font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI',
       Helvetica, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN',
       'Hiragino Sans GB', メイリオ, Meiryo, 'Apple Color Emoji', Arial,
-      sans-serif, 'Segoe UI Emoji', 'Segoe UI Symbol';
+      sans-serif, 'Segoe UI Emoji', 'Segoe UI Symbol'; */
 
     /*background-image: radial-gradient(#ddd 1px, transparent 1px),
       radial-gradient(#ddd 1px, transparent 1px);*/
