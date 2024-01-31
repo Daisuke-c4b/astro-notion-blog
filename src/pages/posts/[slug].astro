@@ -25,6 +25,7 @@ import PostRelativeLink from '../../components/PostRelativeLink.astro'
 import BlogPostsLink from '../../components/BlogPostsLink.astro'
 import BlogTagsLink from '../../components/BlogTagsLink.astro'
 import styles from '../../styles/blog.module.css'
+import Disqus from '../../components/Disqus.astro'
 // アイキャッチ画像を追加
 import PostFeaturedImage from '../../components/PostFeaturedImage.astro'
 
@@ -113,6 +114,7 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
 
       <footer>
         <PostRelativeLink prevPost={prevPost} nextPost={nextPost} />
+        <Disqus />
       </footer>
       <!-- ページトップに戻るボタン -->
       <a class="pagetop" href="#"><div class="pagetop__arrow"></div></a>
