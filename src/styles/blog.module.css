@@ -75,16 +75,16 @@
 }
 
 .cardBody {
-  padding: 18px 20px 22px;
+  padding: 20px 22px 26px;
   display: flex;
   flex-direction: column;
   flex: 1;
-  gap: 6px;
+  gap: 8px;
 }
 
 .cardTitle {
   margin: 2px 0 4px;
-  font-size: 1rem;
+  font-size: 1.06rem;
   font-weight: 700;
   line-height: 1.5;
   letter-spacing: -0.01em;
