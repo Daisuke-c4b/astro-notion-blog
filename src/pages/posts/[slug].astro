@@ -25,9 +25,9 @@ import PostBody from '../../components/PostBody.astro'
 import PostRelativeLink from '../../components/PostRelativeLink.astro'
 import BlogPostsLink from '../../components/BlogPostsLink.astro'
 import BlogTagsLink from '../../components/BlogTagsLink.astro'
+import TableOfContents from '../../components/TableOfContents.astro'
 import styles from '../../styles/blog.module.css'
 import Disqus from '../../components/Disqus.astro'
-// アイキャッチ画像を追加
 import PostFeaturedImage from '../../components/PostFeaturedImage.astro'
 
 export async function getStaticPaths() {
@@ -125,7 +125,8 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
     </div>
   </div>
 
-  <div slot="aside" class="aside">
+  <div slot="aside">
+    <TableOfContents blocks={blocks} />
     <BlogPostsLink
       heading="同じタグの記事"
       posts={postsHavingSameTag.filter(
