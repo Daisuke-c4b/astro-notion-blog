@@ -71,7 +71,7 @@
   align-items: center;
   justify-content: center;
   font-size: 3rem;
-  background: linear-gradient(135deg, #f0f0ec 0%, #e4e4e0 100%);
+  background: var(--border);
 }
 
 .cardBody {

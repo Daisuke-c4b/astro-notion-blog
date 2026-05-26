@@ -68,9 +68,11 @@ const { heading, tags } = Astro.props
     color: var(--fg);
     background: var(--border);
     white-space: nowrap;
-    transition: background 0.15s, opacity 0.15s;
+    transition: background 0.15s, opacity 0.15s, transform 0.15s, box-shadow 0.15s;
   }
   .tags-wrap a:hover {
-    opacity: 0.75;
+    opacity: 0.85;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
   }
 </style>

@@ -23,51 +23,60 @@ for (let i = startPage; i <= endPage; i++) {
 ---
 
 <div class="pagination">
-  <a href={getPageLink(1, tag)} class={isFirstPage && 'inactive'}>&lt;&lt;</a>
+  <a href={getPageLink(1, tag)} class={isFirstPage ? 'disabled' : ''}>&laquo;</a>
   {
     pages.map((p: number) => (
-      <a href={getPageLink(p, tag)} class={p === currentPage && 'inactive'}>
+      <a href={getPageLink(p, tag)} class={p === currentPage ? 'current' : ''}>
         {p}
       </a>
     ))
   }
-  <a href={getPageLink(numberOfPages, tag)} class={isLastPage && 'inactive'}
-    >&gt;&gt;</a
+  <a href={getPageLink(numberOfPages, tag)} class={isLastPage ? 'disabled' : ''}
+    >&raquo;</a
   >
 </div>
 
 <style>
   .pagination {
     display: flex;
-    width: 100%;
-    margin: 0 auto;
-    color: var(--fg);
     justify-content: center;
     align-items: center;
-    gap: 4px;
+    gap: 0.375rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
   }
+
   .pagination a {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2.2rem;
-    height: 2.2rem;
+    min-width: 2.25rem;
+    height: 2.25rem;
+    padding: 0 0.75rem;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    color: var(--fg);
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     font-weight: 500;
-    transition: background 0.15s, border-color 0.15s;
+    color: var(--accents-2);
+    background: transparent;
+    border: 1px solid transparent;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
   }
-  .pagination a:hover:not(.inactive) {
-    background: #F3F4F6;
-    border-color: #D1D5DB;
+
+  .pagination a:hover:not(.disabled):not(.current) {
+    background: var(--border);
+    color: var(--fg);
     opacity: 1;
   }
-  .pagination a.inactive {
-    color: var(--accents-3);
-    border-color: transparent;
-    background: #F3F4F6;
-    cursor: default;
+
+  .pagination a.current {
+    background: var(--fg);
+    color: var(--bg);
+    pointer-events: none;
+  }
+
+  .pagination a.disabled {
+    opacity: 0.3;
+    pointer-events: none;
   }
 </style>
