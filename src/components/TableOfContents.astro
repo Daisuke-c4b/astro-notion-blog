@@ -30,44 +30,76 @@ const toc: TocItem[] = blocks
 
 {toc.length > 0 && (
   <nav class="toc" aria-label="目次">
-    <h2 class="toc-heading">目次</h2>
-    <ul class="toc-list">
-      {toc.map(item => (
-        <li class={`toc-item toc-level-${item.level}`}>
-          <a href={`#${item.id}`} class="toc-link" data-toc-id={item.id}>
-            {item.text}
-          </a>
-        </li>
-      ))}
-    </ul>
+    <div class="toc-header">
+      <span class="toc-icon">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="3" width="7" height="1.5" rx="0.75" fill="currentColor"/>
+          <rect x="2" y="7" width="12" height="1.5" rx="0.75" fill="currentColor"/>
+          <rect x="2" y="11" width="9" height="1.5" rx="0.75" fill="currentColor"/>
+        </svg>
+      </span>
+      <h2 class="toc-title">目次</h2>
+    </div>
+    <div class="toc-track">
+      <div class="toc-indicator" id="toc-indicator"></div>
+      <ul class="toc-list">
+        {toc.map((item, idx) => (
+          <li
+            class={`toc-item toc-level-${item.level}`}
+            data-toc-index={idx}
+          >
+            <a
+              href={`#${item.id}`}
+              class="toc-link"
+              data-toc-id={item.id}
+            >
+              <span class="toc-dot"></span>
+              <span class="toc-text">{item.text}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
   </nav>
 )}
 
 <script>
-  const links = document.querySelectorAll<HTMLAnchorElement>('.toc-link')
-  if (links.length > 0) {
-    const ids = Array.from(links).map(l => l.dataset.tocId).filter(Boolean) as string[]
+  const tocLinks = document.querySelectorAll<HTMLAnchorElement>('.toc-link')
+  const indicator = document.getElementById('toc-indicator')
 
-    const setActive = (id: string) => {
-      links.forEach(l => {
-        if (l.dataset.tocId === id) {
-          l.classList.add('toc-link--active')
-        } else {
-          l.classList.remove('toc-link--active')
+  if (tocLinks.length > 0) {
+    let activeIndex = -1
+
+    const updateActive = (id: string) => {
+      tocLinks.forEach((link, i) => {
+        const isActive = link.dataset.tocId === id
+        link.classList.toggle('toc-link--active', isActive)
+        link.closest('li')?.classList.toggle('toc-item--active', isActive)
+
+        if (isActive && indicator) {
+          const li = link.closest('li') as HTMLElement
+          if (li) {
+            indicator.style.top = `${li.offsetTop + li.offsetHeight / 2 - 6}px`
+            indicator.style.opacity = '1'
+          }
         }
       })
     }
+
+    const ids = Array.from(tocLinks)
+      .map(l => l.dataset.tocId)
+      .filter(Boolean) as string[]
 
     const observer = new IntersectionObserver(
       entries => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            setActive(entry.target.id)
+            updateActive(entry.target.id)
             break
           }
         }
       },
-      { rootMargin: '-10% 0px -80% 0px', threshold: 0 }
+      { rootMargin: '-8% 0px -82% 0px', threshold: 0 }
     )
 
     ids.forEach(id => {
@@ -75,17 +107,17 @@ const toc: TocItem[] = blocks
       if (el) observer.observe(el)
     })
 
-    // Click smooth scroll
-    links.forEach(link => {
-      link.addEventListener('click', (e) => {
+    // Smooth scroll on click
+    tocLinks.forEach(link => {
+      link.addEventListener('click', e => {
         e.preventDefault()
         const id = link.dataset.tocId
         if (!id) return
         const el = document.getElementById(id)
         if (el) {
-          const topOffset = 72
-          const top = el.getBoundingClientRect().top + window.scrollY - topOffset
+          const top = el.getBoundingClientRect().top + window.scrollY - 72
           window.scrollTo({ top, behavior: 'smooth' })
+          updateActive(id)
         }
       })
     })
@@ -94,64 +126,114 @@ const toc: TocItem[] = blocks
 
 <style>
   .toc {
-    margin-bottom: 24px;
-    padding-bottom: 24px;
+    margin-bottom: 28px;
+    padding-bottom: 28px;
     border-bottom: 1px solid var(--border);
   }
-  .toc-heading {
+
+  .toc-header {
     display: flex;
     align-items: center;
     gap: 7px;
-    margin: 0 0 10px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--fg);
-    letter-spacing: 0.02em;
+    margin-bottom: 14px;
   }
-  .toc-heading::before {
-    content: '';
-    display: inline-block;
-    width: 3px;
+
+  .toc-icon {
+    display: flex;
+    align-items: center;
+    color: var(--accents-3);
+  }
+  .toc-icon svg {
+    width: 14px;
     height: 14px;
-    background: #f59e0b;
-    border-radius: 2px;
-    flex-shrink: 0;
   }
+
+  .toc-title {
+    margin: 0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accents-3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .toc-track {
+    position: relative;
+    padding-left: 16px;
+    border-left: 1px solid var(--border);
+  }
+
+  .toc-indicator {
+    position: absolute;
+    left: -5px;
+    top: 8px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--fg);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--fg);
+    transition: top 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .toc-list {
     list-style: none;
     padding: 0;
     margin: 0;
+    display: flex;
+    flex-direction: column;
   }
+
   .toc-item {
-    line-height: 1.3;
+    transition: padding 0.15s;
   }
-  .toc-level-2 {
-    padding-left: 12px;
-  }
-  .toc-level-3 {
-    padding-left: 24px;
-  }
+  .toc-level-2 { padding-left: 10px; }
+  .toc-level-3 { padding-left: 20px; }
+
   .toc-link {
-    display: block;
-    padding: 4px 6px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 4px;
     border-radius: 5px;
-    font-size: 0.8rem;
-    color: var(--accents-2);
-    border-left: 2px solid transparent;
-    transition: color 0.15s, background 0.15s, border-color 0.15s;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: var(--accents-3);
+    transition: color 0.15s, background 0.15s;
+    text-decoration: none;
   }
   .toc-link:hover {
     color: var(--fg);
-    background: var(--border);
+    background: rgba(128,128,128,0.08);
     opacity: 1;
   }
+
+  .toc-dot {
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+    opacity: 0.35;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+
+  .toc-text {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
   .toc-link--active {
-    color: var(--fg);
-    font-weight: 500;
-    border-left-color: var(--fg);
-    background: rgba(0,0,0,0.04);
+    color: var(--fg) !important;
+    font-weight: 600;
+  }
+  .toc-link--active .toc-dot {
+    opacity: 1;
+    transform: scale(1.6);
   }
 </style>

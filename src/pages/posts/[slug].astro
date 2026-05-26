@@ -132,9 +132,10 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
       posts={postsHavingSameTag.filter(
         (p: interfaces.Post) => p.Slug !== post.Slug
       )}
+      accentColor="#6366f1"
     />
-    <BlogPostsLink heading="おすすめ記事" posts={rankedPosts} />
-    <BlogPostsLink heading="最新記事" posts={recentPosts} />
+    <BlogPostsLink heading="おすすめ記事" posts={rankedPosts} accentColor="#f43f5e" />
+    <BlogPostsLink heading="最新記事" posts={recentPosts} accentColor="#3b82f6" />
     <BlogTagsLink heading="タグ" tags={tags} />
   </div>
 </Layout>

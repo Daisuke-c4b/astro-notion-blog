@@ -7,99 +7,134 @@ export interface Props {
   heading: string
   posts: Post[]
   accentColor?: string
+  icon?: string
 }
 
-const { heading, posts, accentColor = '#6366f1' } = Astro.props
+const { heading, posts, accentColor = '#6366f1', icon = '' } = Astro.props
 ---
 
-<div class="blog-posts-link">
-  <h2 class="section-heading" style={`--accent: ${accentColor}`}>{heading}</h2>
+<div class="section">
+  <div class="section-header" style={`--accent: ${accentColor}`}>
+    {icon && <span class="section-icon">{icon}</span>}
+    <h2 class="section-title">{heading}</h2>
+  </div>
   {
     posts.length === 0 ? (
       <NoContents contents={posts} />
     ) : (
-      <ul>
-        {posts.map((post: Post) => (
-          <li>
+      <ol class="section-list">
+        {posts.map((post: Post, i: number) => (
+          <li class="section-item">
+            <span class="item-num" style={`color: ${accentColor}`}>
+              {String(i + 1).padStart(2, '0')}
+            </span>
             <a
               href={getPostLink(post.Slug)}
+              class="item-link"
               title={`${post.Icon?.Emoji || ''}${post.Title}`}
             >
-              {post.Icon && post.Icon.Type === 'emoji' ? (
-                <>
-                  <span>{post.Icon.Emoji}</span>
-                  {post.Title}
-                </>
-              ) : post.Icon && post.Icon.Type === 'external' ? (
-                <>
-                  <img src={post.Icon.Url} alt="Post title icon in a link list" />
-                  {post.Title}
-                </>
-              ) : (
-                post.Title
+              {post.Icon?.Type === 'emoji' && (
+                <span class="item-emoji">{post.Icon.Emoji}</span>
               )}
+              {post.Title}
             </a>
           </li>
         ))}
-      </ul>
+      </ol>
     )
   }
 </div>
 
 <style>
-  .blog-posts-link {
-    margin-bottom: 24px;
+  .section {
+    margin-bottom: 28px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
   }
-  .section-heading {
+  .section:last-child {
+    border-bottom: none;
+  }
+
+  .section-header {
     display: flex;
     align-items: center;
-    gap: 7px;
-    margin: 0 0 8px;
-    font-size: 0.82rem;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .section-icon {
+    font-size: 0.9rem;
+    line-height: 1;
+  }
+
+  .section-title {
+    margin: 0;
+    font-size: 0.78rem;
     font-weight: 700;
     color: var(--fg);
-    letter-spacing: 0.02em;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    position: relative;
+    padding-left: 10px;
   }
-  .section-heading::before {
+  .section-title::before {
     content: '';
-    display: inline-block;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
     width: 3px;
-    height: 14px;
+    height: 12px;
     background: var(--accent);
     border-radius: 2px;
-    flex-shrink: 0;
   }
-  .blog-posts-link ul {
-    list-style-type: none;
+
+  .section-list {
+    list-style: none;
     padding: 0;
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
-  .blog-posts-link ul li a {
-    display: block;
-    padding: 5px 8px;
-    border-radius: 6px;
-    line-height: 1.4;
-    color: var(--accents-2);
-    font-size: 0.82rem;
+
+  .section-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 4px 0;
+  }
+
+  .item-num {
+    font-size: 0.65rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+    min-width: 18px;
+    opacity: 0.8;
+  }
+
+  .item-link {
+    font-size: 0.8rem;
     font-weight: 400;
+    line-height: 1.45;
+    color: var(--accents-2);
     overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    transition: background 0.15s, color 0.15s;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    transition: color 0.15s;
+    flex: 1;
+    min-width: 0;
   }
-  .blog-posts-link ul li a:hover {
-    background: var(--border);
+  .item-link:hover {
     color: var(--fg);
     opacity: 1;
   }
-  .blog-posts-link ul li a span,
-  .blog-posts-link ul li a img {
-    display: inline-block;
-    margin-right: 0.3rem;
-  }
-  .blog-posts-link ul li a img {
-    width: 1rem;
-    height: 1rem;
-    vertical-align: sub;
+
+  .item-emoji {
+    margin-right: 0.2em;
+    font-size: 0.9em;
   }
 </style>
