@@ -6,15 +6,12 @@ import {
   getAllTags,
   getNumberOfPagesByTag,
 } from '../../../../../lib/notion/client.ts'
+import { getPostLink, filePath } from '../../../../../lib/blog-helpers.ts'
 import Layout from '../../../../../layouts/Layout.astro'
 import NoContents from '../../../../../components/NoContents.astro'
 import PostDate from '../../../../../components/PostDate.astro'
 import PostUpdateDate from '../../../../../components/PostUpdateDate.astro'
 import PostTags from '../../../../../components/PostTags.astro'
-import PostTitle from '../../../../../components/PostTitle.astro'
-import PostFeaturedImage from '../../../../../components/PostFeaturedImage.astro'
-import PostExcerpt from '../../../../../components/PostExcerpt.astro'
-import ReadMoreLink from '../../../../../components/ReadMoreLink.astro'
 import Pagination from '../../../../../components/Pagination.astro'
 import BlogPostsLink from '../../../../../components/BlogPostsLink.astro'
 import BlogTagsLink from '../../../../../components/BlogTagsLink.astro'
@@ -49,6 +46,16 @@ const [posts, rankedPosts, tags, numberOfPages] = await Promise.all([
 ])
 
 const currentTag = posts[0].Tags.find((t) => t.name === tag)
+
+function getImageSrc(post: any): string {
+  if (!post.FeaturedImage?.Url) return ''
+  if (import.meta.env.DEV) return post.FeaturedImage.Url
+  try {
+    return filePath(new URL(post.FeaturedImage.Url))
+  } catch {
+    return post.FeaturedImage.Url
+  }
+}
 ---
 
 <Layout
@@ -56,34 +63,55 @@ const currentTag = posts[0].Tags.find((t) => t.name === tag)
   path={`/posts/tag/${tag}/page/${page}`}
 >
   <div slot="main" class={styles.main}>
-    <header>
-      <div class="tag-container">
-        <span class={`tag ${currentTag.color}`}>{tag}</span>
-        {page}/{numberOfPages}
-      </div>
+    <header class="tag-header">
+      <span class={`tag ${currentTag.color}`}>{tag}</span>
+      <span class="page-num">{page} / {numberOfPages}</span>
     </header>
 
     {
       posts.length === 0 ? (
         <NoContents contents={posts} />
       ) : (
-        posts.map((post) => (
-          <div class={styles.post} key={post.Slug}>
-            <PostTitle post={post} />
-            <div style="display: flex; flex-wrap: wrap; column-gap:1em;">
-              <PostDate post={post} />
-              <PostUpdateDate post={post} />
-            </div>
-            <PostTags post={post} />
-            <PostFeaturedImage post={post} />
-            <PostExcerpt post={post} />
-            <ReadMoreLink post={post} />
-          </div>
-        ))
+        <div class={styles.grid}>
+          {posts.map((post) => {
+            const imgSrc = getImageSrc(post)
+            return (
+              <article class={styles.card}>
+                <a href={getPostLink(post.Slug)} class={styles.cardImage} aria-hidden="true" tabindex="-1">
+                  {imgSrc ? (
+                    <img src={imgSrc} alt="" loading="lazy" />
+                  ) : (
+                    <div class={styles.cardPlaceholder}>
+                      {post.Icon?.Type === 'emoji' ? post.Icon.Emoji : '📝'}
+                    </div>
+                  )}
+                </a>
+                <div class={styles.cardBody}>
+                  <PostTags post={post} />
+                  <h2 class={styles.cardTitle}>
+                    <a href={getPostLink(post.Slug)}>
+                      {post.Icon?.Type === 'emoji' && (
+                        <span class={styles.cardTitleIcon}>{post.Icon.Emoji}</span>
+                      )}
+                      {post.Title}
+                    </a>
+                  </h2>
+                  <div class={styles.cardMeta}>
+                    <PostDate post={post} />
+                    <PostUpdateDate post={post} />
+                  </div>
+                  {post.Excerpt && (
+                    <p class={styles.cardExcerpt}>{post.Excerpt}</p>
+                  )}
+                </div>
+              </article>
+            )
+          })}
+        </div>
       )
     }
 
-    <footer>
+    <footer class={styles.footer}>
       <Pagination
         tag={tag}
         currentPage={parseInt(page, 10)}
@@ -92,27 +120,29 @@ const currentTag = posts[0].Tags.find((t) => t.name === tag)
     </footer>
   </div>
 
-  <div slot="aside" class={styles.aside}>
+  <div slot="aside">
     <BlogPostsLink heading="おすすめ記事" posts={rankedPosts} />
     <BlogTagsLink heading="タグ" tags={tags} />
   </div>
 </Layout>
 
 <style>
-  .tag-container {
-    margin: 0;
-    line-height: 1.3;
-    font-size: 1.2rem;
-    font-weight: normal;
+  .tag-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
   }
-  @media (max-width: 640px) {
-    .tag-container {
-      font-size: 1.15rem;
-    }
-  }
-  .tag-container span.tag {
+  .tag-header .tag {
+    font-size: 0.85rem;
+    font-weight: 600;
     border-radius: 4px;
-    padding: 3px 9px;
-    background: var(--tag-bg-light-gray);
+    padding: 4px 10px;
+  }
+  .page-num {
+    font-size: 0.82rem;
+    color: var(--accents-3);
   }
 </style>
