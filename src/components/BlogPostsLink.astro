@@ -6,13 +6,14 @@ import NoContents from './NoContents.astro'
 export interface Props {
   heading: string
   posts: Post[]
+  accentColor?: string
 }
 
-const { heading, posts } = Astro.props
+const { heading, posts, accentColor = '#6366f1' } = Astro.props
 ---
 
 <div class="blog-posts-link">
-  <h2>{heading}</h2>
+  <h2 class="section-heading" style={`--accent: ${accentColor}`}>{heading}</h2>
   {
     posts.length === 0 ? (
       <NoContents contents={posts} />
@@ -31,10 +32,7 @@ const { heading, posts } = Astro.props
                 </>
               ) : post.Icon && post.Icon.Type === 'external' ? (
                 <>
-                  <img
-                    src={post.Icon.Url}
-                    alt="Post title icon in a link list"
-                  />
+                  <img src={post.Icon.Url} alt="Post title icon in a link list" />
                   {post.Title}
                 </>
               ) : (
@@ -50,39 +48,48 @@ const { heading, posts } = Astro.props
 
 <style>
   .blog-posts-link {
-    margin-bottom: 1.5rem;
+    margin-bottom: 24px;
   }
-  .blog-posts-link h2 {
-    margin: 0 0 0.6rem;
-    color: var(--accents-3);
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+  .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: 0.02em;
+  }
+  .section-heading::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 14px;
+    background: var(--accent);
+    border-radius: 2px;
+    flex-shrink: 0;
   }
   .blog-posts-link ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
   }
-  .blog-posts-link ul li {
-    border-radius: var(--radius);
-  }
   .blog-posts-link ul li a {
     display: block;
-    padding: 6px 8px;
+    padding: 5px 8px;
     border-radius: 6px;
     line-height: 1.4;
-    color: var(--fg);
-    font-size: 0.85rem;
+    color: var(--accents-2);
+    font-size: 0.82rem;
     font-weight: 400;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    transition: background 0.15s;
+    transition: background 0.15s, color 0.15s;
   }
   .blog-posts-link ul li a:hover {
-    background: #F3F4F6;
+    background: var(--border);
+    color: var(--fg);
     opacity: 1;
   }
   .blog-posts-link ul li a span,
@@ -91,8 +98,8 @@ const { heading, posts } = Astro.props
     margin-right: 0.3rem;
   }
   .blog-posts-link ul li a img {
-    width: 1.1rem;
-    height: 1.1rem;
+    width: 1rem;
+    height: 1rem;
     vertical-align: sub;
   }
 </style>

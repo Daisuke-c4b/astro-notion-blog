@@ -99,12 +99,23 @@ const toc: TocItem[] = blocks
     border-bottom: 1px solid var(--border);
   }
   .toc-heading {
+    display: flex;
+    align-items: center;
+    gap: 7px;
     margin: 0 0 10px;
-    color: var(--accents-3);
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: 0.02em;
+  }
+  .toc-heading::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 14px;
+    background: #f59e0b;
+    border-radius: 2px;
+    flex-shrink: 0;
   }
   .toc-list {
     list-style: none;

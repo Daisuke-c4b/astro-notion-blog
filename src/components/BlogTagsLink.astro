@@ -13,7 +13,7 @@ const { heading, tags } = Astro.props
 ---
 
 <div class="blog-tags-link">
-  <h2>{heading}</h2>
+  <h2 class="section-heading">{heading}</h2>
   {
     tags.length === 0 ? (
       <NoContents contents={tags} />
@@ -31,15 +31,26 @@ const { heading, tags } = Astro.props
 
 <style>
   .blog-tags-link {
-    margin-bottom: 1.5rem;
+    margin-bottom: 24px;
   }
-  .blog-tags-link h2 {
-    margin: 0 0 0.6rem;
-    color: var(--accents-3);
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+  .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: 0.02em;
+  }
+  .section-heading::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 14px;
+    background: #10b981;
+    border-radius: 2px;
+    flex-shrink: 0;
   }
   .tags-wrap {
     display: flex;
@@ -51,19 +62,15 @@ const { heading, tags } = Astro.props
     align-items: center;
     border-radius: 20px;
     padding: 3px 10px;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 500;
     line-height: 1.4;
     color: var(--fg);
-    background: #F3F4F6;
-    transition: background 0.15s, opacity 0.15s;
+    background: var(--border);
     white-space: nowrap;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    transition: background 0.15s, opacity 0.15s;
   }
   .tags-wrap a:hover {
-    background: #E5E7EB;
-    opacity: 1;
+    opacity: 0.75;
   }
 </style>
