@@ -18,47 +18,52 @@ const { heading, tags } = Astro.props
     tags.length === 0 ? (
       <NoContents contents={tags} />
     ) : (
-      <ul>
+      <div class="tags-wrap">
         {tags.map((tag: SelectProperty) => (
-          <li>
-            <a href={getTagLink(tag.name)} class={`tag ${tag.color}`}>
-              {tag.name}
-            </a>
-          </li>
+          <a href={getTagLink(tag.name)} class={`tag ${tag.color}`}>
+            {tag.name}
+          </a>
         ))}
-      </ul>
+      </div>
     )
   }
 </div>
 
 <style>
   .blog-tags-link {
+    margin-bottom: 1.5rem;
   }
   .blog-tags-link h2 {
-    margin: 0;
-    padding-left: 0.4rem;
-    color: #777;
-    font-size: 0.95rem;
+    margin: 0 0 0.6rem;
+    color: var(--accents-3);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
-  .blog-tags-link ul {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 0.3rem;
-    margin-block-end: 1rem;
-  }
-  .blog-tags-link ul li {
-    position: relative;
-    padding: 0.4rem;
-    line-height: 1.2rem;
-    font-size: 0.9rem;
+  .tags-wrap {
+    display: flex;
+    flex-wrap: wrap;
     gap: 6px;
   }
-  .blog-tags-link ul li a {
-    min-width: 0;
-    border-radius: 3px;
-    padding: 2px 6px;
-    line-height: 1.2;
-    color: rgb(50, 48, 44);
-    background: rgba(227, 226, 224, 0.5);
+  .tags-wrap a {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--fg);
+    background: #F3F4F6;
+    transition: background 0.15s, opacity 0.15s;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .tags-wrap a:hover {
+    background: #E5E7EB;
+    opacity: 1;
   }
 </style>

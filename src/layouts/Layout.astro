@@ -69,10 +69,10 @@ if (database.Icon && database.Icon.Type === 'file') {
     <meta name="twitter:description" content={siteDescription} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={ogImage || siteOGImage} />
-    <!-- Google Fontsより追加 -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Zen+Maru+Gothic:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
@@ -208,68 +208,67 @@ if (database.Icon && database.Icon.Type === 'file') {
 </html>
 
 <style>
-  /* ヘッダー画像のサイズを調整 */
   .container {
     display: flex;
     min-height: 100vh;
     max-width: 1280px;
     margin: 0 auto;
   }
-
-  /*CSSの.containerクラス（または該当するクラス）にメディアクエリを追加し、
-  スマートフォンの画面サイズに合わせてコンテナの幅を調整  */
   @media (max-width: 959px) {
-  .container {
-    display: block;
+    .container {
+      display: block;
     }
   }
 
   .container > div {
     display: flex;
+    width: 100%;
     max-width: 1280px;
   }
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     .container > div {
-      display: block;
+      flex-direction: column;
     }
   }
 
   main {
     flex: 1;
-    order: 2;
-    justify-content: space-between;
-  }
-  @media (max-width: 640px) {
-    main {
-      order: 1;
-    }
+    order: 1;
+    min-width: 0;
   }
 
   aside {
-    order: 1;
-    width: 240px;
-    padding: 20px 20px;
-    background-color: #f4f4f4;
+    order: 2;
+    width: 260px;
+    flex-shrink: 0;
+    padding: 40px 24px;
+    border-left: 1px solid var(--border);
     position: sticky;
     top: 0;
-    height: 100vh
+    height: 100vh;
+    overflow-y: auto;
   }
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     aside {
       order: 2;
       width: 100%;
+      height: auto;
+      position: static;
+      border-left: none;
+      border-top: 1px solid var(--border);
+      padding: 24px 18px;
     }
   }
 
   .svg-container {
     display: flex;
-    justify-content: space-between; /* 左揃え。他のオプションにはcenter（中央揃え）、space-between（間隔均等）等がある */
-    align-items: center; /* アイテムを垂直方向の中央に揃える */
-    height: 120px;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 12px 0;
   }
 
-  div.cover {
-  }
   div.cover img {
     display: block;
     width: 100%;
@@ -279,31 +278,36 @@ if (database.Icon && database.Icon.Type === 'file') {
   }
 
   div.content {
-    padding: 40px 40px;
+    padding: 40px 48px;
     width: 100%;
-    max-width: 60em;
-    min-width: 1em;
+    max-width: 64em;
+    min-width: 0;
     margin-inline: auto;
   }
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     div.content {
-      padding: 0 18px;
+      padding: 24px 20px;
     }
   }
 
   main header {
-    padding: 20px 0 20px;
+    padding: 24px 0 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
   }
   main header h1 {
-    font-weight: 1000;
-    color: #333;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.02em;
   }
   main header h1 a {
     display: block;
     color: inherit;
+    transition: opacity 0.2s;
   }
   main header h1 a:hover {
     color: inherit;
+    opacity: 0.75;
   }
   main header h1 a span,
   main header h1 a img {
@@ -326,26 +330,30 @@ if (database.Icon && database.Icon.Type === 'file') {
   }
 
   main header div.description {
-    padding: 0.3rem 0 0.6rem;
-    font-size: 0.95rem;
+    padding: 0.5rem 0 0;
+    font-size: 0.9rem;
+    color: var(--accents-3);
+    font-weight: 400;
   }
 
   main footer {
-    margin: 30px 0 10px;
+    margin: 48px 0 16px;
     text-align: center;
     font-size: 0.75rem;
+    color: var(--accents-3);
   }
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     main footer {
-      margin: 0 auto 30px;
+      margin: 32px auto 24px;
     }
   }
   main footer span {
-    color: #777;
+    color: var(--accents-3);
   }
   main footer a {
     color: inherit;
     text-decoration: underline;
+    text-underline-offset: 2px;
   }
 </style>
 
@@ -356,25 +364,20 @@ if (database.Icon && database.Icon.Type === 'file') {
     --gap: 1rem;
     --gap-double: 2rem;
 
-    /* 背景色をグレーよりの白色に変更 */
-    /* --bg: #fff; */
-    /* --bg: #EFF0E6; */
-    --bg: #FDFDFD;
-
-    --fg: #333;
-    --accents-1: #666;
-    --accents-2: #666;
-    --accents-3: #666;
+    --bg: #FAFAFA;
+    --fg: #111827;
+    --accents-1: #374151;
+    --accents-2: #4B5563;
+    --accents-3: #9CA3AF;
     --geist-foreground: #000;
-    --geist-success: #690;
+    --geist-success: #059669;
 
-    --radius: 4px;
+    --radius: 8px;
+    --border: #E5E7EB;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
 
-    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-      'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
-      'Helvetica Neue', sans-serif;
-    --font-mono: SFMono-Regular, Menlo, Consolas, 'PT Mono', 'Liberation Mono',
-      Courier, monospace;
+    --font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: SFMono-Regular, Menlo, Consolas, 'PT Mono', 'Liberation Mono', Courier, monospace;
   }
 
   * {
@@ -393,25 +396,11 @@ if (database.Icon && database.Icon.Type === 'file') {
     min-height: 100vh;
     background: var(--bg);
     color: var(--fg);
-    /* Google Fontsより追加 */
-    font-family: 'Noto Sans JP', sans-serif;
-    font-family: 'Zen Maru Gothic', serif;
-    /* font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-      Helvetica, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN',
-      'Hiragino Sans GB', メイリオ, Meiryo, 'Apple Color Emoji', Arial,
-      sans-serif, 'Segoe UI Emoji', 'Segoe UI Symbol'; */
-
-    /*background-image: radial-gradient(#ddd 1px, transparent 1px),
-      radial-gradient(#ddd 1px, transparent 1px);*/
-    background-position: 0 0, 25px 25px;
-    background-attachment: fixed;
-    background-size: 50px 50px;
-
-    /* Hack */
+    font-family: var(--font-sans);
     overflow-x: hidden;
-
     -webkit-font-smoothing: antialiased;
     -webkit-text-size-adjust: 100%;
+    line-height: 1.7;
   }
 
   figure {
@@ -424,9 +413,11 @@ if (database.Icon && database.Icon.Type === 'file') {
   a {
     color: var(--accents-1);
     text-decoration: none;
+    transition: opacity 0.15s;
   }
   a:hover {
     color: var(--accents-1);
+    opacity: 0.75;
   }
 
   mark {
@@ -439,27 +430,28 @@ if (database.Icon && database.Icon.Type === 'file') {
     margin: 0;
     color: var(--fg);
     font-size: 2rem;
-    font-weight: 1000;
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     h1 {
       font-size: 1.6rem;
     }
   }
 
   ol {
-    color: #222;
-    font-weight: 1000;
-    font-size: 0.9rem;
-    line-height: 1.8rem;
+    color: var(--fg);
+    font-weight: 400;
+    font-size: 0.95rem;
+    line-height: 1.9;
   }
   p,
   ul {
-    color: #222;
-    font-weight: 1000;
+    color: var(--fg);
+    font-weight: 400;
     font-size: 1rem;
-    line-height: 1.8rem;
+    line-height: 1.9;
   }
   ul,
   ol {
@@ -505,8 +497,8 @@ if (database.Icon && database.Icon.Type === 'file') {
   }
 
   table th {
-    font-weight: 1000;
-    background-color: #f4f4f4;
+    font-weight: 700;
+    background-color: #F3F4F6;
   }
 
   table td,
