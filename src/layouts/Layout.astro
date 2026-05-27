@@ -222,8 +222,11 @@ if (database.Icon && database.Icon.Type === 'file') {
       gap: 6px;
     }
     .logo-text {
-      max-width: none;
+      /* "Excelおさるくんの"(≈113px)が収まり、後続の"astro-notion-blog"が次行に落ちる幅 */
+      max-width: 125px;
       white-space: normal;
+      word-break: keep-all;
+      overflow-wrap: break-word;
       font-size: 0.82rem;
       line-height: 1.35;
     }
