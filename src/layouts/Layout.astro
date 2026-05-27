@@ -72,7 +72,7 @@ if (database.Icon && database.Icon.Type === 'file') {
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Raleway:wght@700;800&display=swap" rel="stylesheet">
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
@@ -98,7 +98,20 @@ if (database.Icon && database.Icon.Type === 'file') {
             <img src={customIconURL} alt="Site icon" class="logo-img custom-icon" />
           ) : null
         }
-        <span class="logo-text">{database.Title}</span>
+        <span class="logo-text">
+          {(() => {
+            const title = database.Title
+            const idx = title.indexOf('の')
+            if (idx < 0) return title
+            return (
+              <>
+                {title.slice(0, idx + 1)}
+                <br class="title-br" />
+                {title.slice(idx + 1)}
+              </>
+            )
+          })()}
+        </span>
       </a>
       <div class="topbar-controls">
         <SearchButton />
@@ -207,7 +220,11 @@ if (database.Icon && database.Icon.Type === 'file') {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-family: 'Raleway', 'Noto Sans JP', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.01em;
   }
+  br.title-br { display: none; }
   @media (max-width: 540px) {
     .site-topbar {
       height: auto;
@@ -222,14 +239,11 @@ if (database.Icon && database.Icon.Type === 'file') {
       gap: 6px;
     }
     .logo-text {
-      /* "Excelおさるくんの"(≈113px)が収まり、後続の"astro-notion-blog"が次行に落ちる幅 */
-      max-width: 125px;
       white-space: normal;
-      word-break: keep-all;
-      overflow-wrap: break-word;
       font-size: 0.82rem;
       line-height: 1.35;
     }
+    br.title-br { display: block; }
     .topbar-controls {
       flex-shrink: 0;
       align-self: center;
