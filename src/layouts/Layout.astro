@@ -210,16 +210,26 @@ if (database.Icon && database.Icon.Type === 'file') {
   }
   @media (max-width: 540px) {
     .site-topbar {
-      padding: 0 14px;
+      height: auto;
+      min-height: 52px;
+      padding: 8px 14px;
+      align-items: center;
+    }
+    .topbar-logo {
+      flex: 1;
+      min-width: 0;
+      align-items: flex-start;
+      gap: 6px;
     }
     .logo-text {
-      display: none;
+      max-width: none;
+      white-space: normal;
+      font-size: 0.82rem;
+      line-height: 1.35;
     }
-    /* アイコンがない場合のフォールバック: テキストを短縮表示 */
-    .topbar-logo:not(:has(.logo-icon)):not(:has(.logo-img)) .logo-text {
-      display: block;
-      max-width: 120px;
-      font-size: 0.85rem;
+    .topbar-controls {
+      flex-shrink: 0;
+      align-self: center;
     }
   }
 

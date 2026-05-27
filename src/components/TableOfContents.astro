@@ -117,7 +117,7 @@ const toc: TocItem[] = blocks
         if (el) {
           // <a id="..."> はインライン要素なので getBoundingClientRect が不安定
           // 子のブロック要素（h1-h4）を直接ターゲットにして精度を上げる
-          const blockEl = (el.querySelector('h1,h2,h3,h4') as HTMLElement) || el
+          const blockEl = (el.querySelector('h1,h2,h3,h4,h5') as HTMLElement) || el
           const topbar = document.querySelector('.site-topbar') as HTMLElement
           const offset = (topbar?.offsetHeight ?? 56) + 16
           const top = blockEl.getBoundingClientRect().top + window.scrollY - offset
