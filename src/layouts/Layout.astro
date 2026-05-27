@@ -208,8 +208,19 @@ if (database.Icon && database.Icon.Type === 'file') {
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  @media (max-width: 480px) {
-    .logo-text { max-width: 160px; }
+  @media (max-width: 540px) {
+    .site-topbar {
+      padding: 0 14px;
+    }
+    .logo-text {
+      display: none;
+    }
+    /* アイコンがない場合のフォールバック: テキストを短縮表示 */
+    .topbar-logo:not(:has(.logo-icon)):not(:has(.logo-img)) .logo-text {
+      display: block;
+      max-width: 120px;
+      font-size: 0.85rem;
+    }
   }
 
   .topbar-controls {
@@ -318,9 +329,7 @@ if (database.Icon && database.Icon.Type === 'file') {
   div.content {
     padding: 40px 48px;
     width: 100%;
-    max-width: 60em;
     min-width: 0;
-    margin-inline: auto;
   }
   @media (max-width: 768px) {
     div.content {
