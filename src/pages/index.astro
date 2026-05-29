@@ -18,7 +18,7 @@ import BlogTagsLink from '../components/BlogTagsLink.astro'
 import styles from '../styles/blog.module.css'
 
 const [posts, rankedPosts, tags, numberOfPages] = await Promise.all([
-  getPosts(NUMBER_OF_POSTS_PER_PAGE),
+  getPosts(NUMBER_OF_POSTS_PER_PAGE + 1),
   getRankedPosts(),
   getAllTags(),
   getNumberOfPages(),

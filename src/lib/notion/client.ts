@@ -201,7 +201,13 @@ export async function getPostsByPage(page: number): Promise<Post[]> {
 
   const allPosts = await getAllPosts()
 
-  const startIndex = (page - 1) * NUMBER_OF_POSTS_PER_PAGE
+  // Page 1 shows one extra post (featured hero + a full grid row)
+  if (page === 1) {
+    return allPosts.slice(0, NUMBER_OF_POSTS_PER_PAGE + 1)
+  }
+
+  const startIndex =
+    NUMBER_OF_POSTS_PER_PAGE + 1 + (page - 2) * NUMBER_OF_POSTS_PER_PAGE
   const endIndex = startIndex + NUMBER_OF_POSTS_PER_PAGE
 
   return allPosts.slice(startIndex, endIndex)
@@ -229,9 +235,15 @@ export async function getPostsByTagAndPage(
 
 export async function getNumberOfPages(): Promise<number> {
   const allPosts = await getAllPosts()
+  // Page 1 holds NUMBER_OF_POSTS_PER_PAGE + 1 posts; subsequent pages hold NUMBER_OF_POSTS_PER_PAGE
+  const remaining = allPosts.length - (NUMBER_OF_POSTS_PER_PAGE + 1)
+  if (remaining <= 0) {
+    return 1
+  }
   return (
-    Math.floor(allPosts.length / NUMBER_OF_POSTS_PER_PAGE) +
-    (allPosts.length % NUMBER_OF_POSTS_PER_PAGE > 0 ? 1 : 0)
+    1 +
+    Math.floor(remaining / NUMBER_OF_POSTS_PER_PAGE) +
+    (remaining % NUMBER_OF_POSTS_PER_PAGE > 0 ? 1 : 0)
   )
 }
 
