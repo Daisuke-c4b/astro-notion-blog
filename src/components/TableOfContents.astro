@@ -68,16 +68,14 @@ const toc: TocItem[] = blocks
   const indicator = document.getElementById('toc-indicator')
 
   if (tocLinks.length > 0) {
-    let activeIndex = -1
-
     const updateActive = (id: string) => {
-      tocLinks.forEach((link, i) => {
+      tocLinks.forEach((link) => {
         const isActive = link.dataset.tocId === id
         link.classList.toggle('toc-link--active', isActive)
         link.closest('li')?.classList.toggle('toc-item--active', isActive)
 
         if (isActive && indicator) {
-          const li = link.closest('li') as HTMLElement
+          const li = link.closest('li') as HTMLElement | null
           if (li) {
             indicator.style.top = `${li.offsetTop + li.offsetHeight / 2 - 6}px`
             indicator.style.opacity = '1'
@@ -86,38 +84,57 @@ const toc: TocItem[] = blocks
       })
     }
 
-    const ids = Array.from(tocLinks)
-      .map(l => l.dataset.tocId)
-      .filter(Boolean) as string[]
+    // 各見出しの実ブロック(h3/h4/h5)を計測対象にする（id は包む <a> に付いている）
+    const headings = Array.from(tocLinks)
+      .map((l) => {
+        const anchor = document.getElementById(l.dataset.tocId || '')
+        if (!anchor) return null
+        const block = anchor.querySelector(
+          'h1,h2,h3,h4,h5'
+        ) as HTMLElement | null
+        return { id: anchor.id, el: block || anchor }
+      })
+      .filter((h): h is { id: string; el: HTMLElement } => h !== null)
 
-    const observer = new IntersectionObserver(
-      entries => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            updateActive(entry.target.id)
-            break
-          }
+    // sticky topbar(56px) の少し下を判定ライン(=見出しが画面上端付近に来たら現在地)
+    const OFFSET = 96
+
+    let ticking = false
+    const onScroll = () => {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        ticking = false
+        if (headings.length === 0) return
+        let currentId = headings[0].id
+        for (const h of headings) {
+          if (h.el.getBoundingClientRect().top <= OFFSET) currentId = h.id
+          else break
         }
-      },
-      { rootMargin: '-8% 0px -82% 0px', threshold: 0 }
-    )
+        // ページ最下部では最後の見出しを必ずアクティブに（手前で止まる対策）
+        const nearBottom =
+          window.innerHeight + window.scrollY >=
+          document.documentElement.scrollHeight - 4
+        if (nearBottom) currentId = headings[headings.length - 1].id
+        updateActive(currentId)
+      })
+    }
 
-    ids.forEach(id => {
-      const el = document.getElementById(id)
-      if (el) observer.observe(el)
-    })
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    onScroll()
 
     // Smooth scroll on click
-    tocLinks.forEach(link => {
-      link.addEventListener('click', e => {
+    tocLinks.forEach((link) => {
+      link.addEventListener('click', (e) => {
         e.preventDefault()
         const id = link.dataset.tocId
         if (!id) return
         const el = document.getElementById(id)
         if (el) {
           // 子のブロック要素（h3/h4/h5）に scroll-margin-top が設定済み
-          // scrollIntoView を使うことで画像遅延読み込み中の位置ずれも緩和できる
-          const blockEl = (el.querySelector('h1,h2,h3,h4,h5') as HTMLElement) || el
+          const blockEl =
+            (el.querySelector('h1,h2,h3,h4,h5') as HTMLElement) || el
           blockEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
           updateActive(id)
         }
