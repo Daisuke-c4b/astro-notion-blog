@@ -62,30 +62,32 @@ const fileAtacchedBlocks = extractTargetBlocks('image', blocks)
     return imageOrFile && imageOrFile.File && imageOrFile.File.Url
   })
 
-// Download files
-await Promise.all(
-  fileAtacchedBlocks
-    .map(async (block) => {
-      const expiryTime = (block.Image || block.File).File.ExpiryTime
-      if (Date.parse(expiryTime) > Date.now()) {
-        return Promise.resolve(block)
-      }
-      return getBlock(block.Id)
-    })
-    .map((promise) =>
-      promise.then((block) => {
-        let url!: URL
-        try {
-          url = new URL((block.Image || block.File).File.Url)
-        } catch (err) {
-          console.log('Invalid file URL')
-          return Promise.reject()
+// Download files (skip in dev — images load from raw Notion URLs)
+if (!import.meta.env.DEV) {
+  await Promise.all(
+    fileAtacchedBlocks
+      .map(async (block) => {
+        const expiryTime = (block.Image || block.File).File.ExpiryTime
+        if (Date.parse(expiryTime) > Date.now()) {
+          return Promise.resolve(block)
         }
-        return Promise.resolve(url)
+        return getBlock(block.Id)
       })
-    )
-    .map((promise) => promise.then(downloadFile))
-)
+      .map((promise) =>
+        promise.then((block) => {
+          let url!: URL
+          try {
+            url = new URL((block.Image || block.File).File.Url)
+          } catch (err) {
+            console.log('Invalid file URL')
+            return Promise.reject()
+          }
+          return Promise.resolve(url)
+        })
+      )
+      .map((promise) => promise.then(downloadFile))
+  )
+}
 
 const currentPostIndex = allPosts.findIndex((post) => post.Slug === slug)
 const prevPost = allPosts[currentPostIndex + 1]
