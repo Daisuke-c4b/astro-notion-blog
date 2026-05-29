@@ -17,7 +17,9 @@
 
 /* ===== Featured hero (home) ===== */
 .featured {
-  display: block;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  align-items: center;
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: calc(var(--radius) + 4px);
@@ -35,6 +37,7 @@
   background: var(--border);
   aspect-ratio: 16 / 9;
   width: 100%;
+  min-width: 0;
 }
 .featuredImage img {
   width: 100%;
@@ -49,8 +52,9 @@
 .featuredBody {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 28px 40px 34px;
+  justify-content: center;
+  gap: 13px;
+  padding: 32px 40px;
   min-width: 0;
 }
 .featuredTitle {
@@ -91,6 +95,8 @@
 }
 @media (max-width: 768px) {
   .featured {
+    grid-template-columns: 1fr;
+    align-items: stretch;
     margin-bottom: 32px;
   }
   .featuredBody {
