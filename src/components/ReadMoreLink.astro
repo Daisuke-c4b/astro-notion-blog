@@ -10,23 +10,36 @@ const { post } = Astro.props
 ---
 
 <div class="read-more-link">
-  <a href={getPostLink(post.Slug)}>→Read more</a>
+  <a href={getPostLink(post.Slug)}>
+    続きを読む <span class="arrow">→</span>
+  </a>
 </div>
 
 <style>
   .read-more-link {
-    color: var(--fg);
+    margin-top: 14px;
   }
   .read-more-link a {
-    color: rgb(55, 53, 47);
-    font-size: 1rem;
-    font-weight: 500;
-    line-height: 2rem;
-    text-decoration: underline;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--accents-2);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 20px;
+    transition: color 0.15s, background 0.15s, border-color 0.15s, gap 0.2s;
   }
-  @media (max-width: 640px) {
-    .read-more-link a {
-      width: 50%;
-    }
+  .read-more-link a:hover {
+    color: var(--fg);
+    background: var(--border);
+    border-color: var(--fg);
+    gap: 0.625rem;
+    opacity: 1;
+  }
+  .arrow {
+    line-height: 1;
   }
 </style>

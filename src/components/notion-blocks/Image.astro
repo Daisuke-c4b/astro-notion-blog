@@ -14,7 +14,9 @@ let image = ''
 if (block.Image.External) {
   image = block.Image.External.Url
 } else if (block.Image.File) {
-  image = filePath(new URL(block.Image.File.Url))
+  image = import.meta.env.DEV
+    ? block.Image.File.Url
+    : filePath(new URL(block.Image.File.Url))
 }
 ---
 

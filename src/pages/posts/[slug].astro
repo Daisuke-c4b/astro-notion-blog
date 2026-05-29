@@ -18,13 +18,17 @@ import {
 } from '../../lib/blog-helpers.ts'
 import Layout from '../../layouts/Layout.astro'
 import PostDate from '../../components/PostDate.astro'
+import PostUpdateDate from '../../components/PostUpdateDate.astro'
 import PostTags from '../../components/PostTags.astro'
 import PostTitle from '../../components/PostTitle.astro'
 import PostBody from '../../components/PostBody.astro'
 import PostRelativeLink from '../../components/PostRelativeLink.astro'
 import BlogPostsLink from '../../components/BlogPostsLink.astro'
 import BlogTagsLink from '../../components/BlogTagsLink.astro'
+import TableOfContents from '../../components/TableOfContents.astro'
 import styles from '../../styles/blog.module.css'
+import Disqus from '../../components/Disqus.astro'
+import PostFeaturedImage from '../../components/PostFeaturedImage.astro'
 
 export async function getStaticPaths() {
   const posts = await getAllPosts()
@@ -35,7 +39,7 @@ const { slug } = Astro.params
 
 const post = await getPostBySlug(slug)
 if (!post) {
-  throw new Error(`Post not found. slug: ${slug}`)
+  throw new Error('Post not found. slug: ${slug}')
 }
 
 const [blocks, allPosts, rankedPosts, recentPosts, tags, postsHavingSameTag] =
@@ -58,30 +62,32 @@ const fileAtacchedBlocks = extractTargetBlocks('image', blocks)
     return imageOrFile && imageOrFile.File && imageOrFile.File.Url
   })
 
-// Download files
-await Promise.all(
-  fileAtacchedBlocks
-    .map(async (block) => {
-      const expiryTime = (block.Image || block.File).File.ExpiryTime
-      if (Date.parse(expiryTime) > Date.now()) {
-        return Promise.resolve(block)
-      }
-      return getBlock(block.Id)
-    })
-    .map((promise) =>
-      promise.then((block) => {
-        let url!: URL
-        try {
-          url = new URL((block.Image || block.File).File.Url)
-        } catch {
-          console.log('Invalid file URL: ', (block.Image || block.File)?.File?.Url)
-          return Promise.reject()
+// Download files (skip in dev — images load from raw Notion URLs)
+if (!import.meta.env.DEV) {
+  await Promise.all(
+    fileAtacchedBlocks
+      .map(async (block) => {
+        const expiryTime = (block.Image || block.File).File.ExpiryTime
+        if (Date.parse(expiryTime) > Date.now()) {
+          return Promise.resolve(block)
         }
-        return Promise.resolve(url)
+        return getBlock(block.Id)
       })
-    )
-    .map((promise) => promise.then(downloadFile))
-)
+      .map((promise) =>
+        promise.then((block) => {
+          let url!: URL
+          try {
+            url = new URL((block.Image || block.File).File.Url)
+          } catch (err) {
+            console.log('Invalid file URL')
+            return Promise.reject()
+          }
+          return Promise.resolve(url)
+        })
+      )
+      .map((promise) => promise.then(downloadFile))
+  )
+}
 
 const currentPostIndex = allPosts.findIndex((post) => post.Slug === slug)
 const prevPost = allPosts[currentPostIndex + 1]
@@ -101,27 +107,39 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
 >
   <div slot="main" class={styles.main}>
     <div class={styles.post}>
-      <PostDate post={post} />
-      <PostTags post={post} />
-      <PostTitle post={post} enableLink={false} />
+      <header class={styles.postHeader}>
+        <PostTags post={post} />
+        <PostTitle post={post} enableLink={false} />
+        <div class={styles.postMeta}>
+          <PostDate post={post} />
+          <PostUpdateDate post={post} />
+        </div>
+      </header>
+      <!-- 👇アイキャッチ表示処理 -->
+      <PostFeaturedImage post={post} />
       <PostBody blocks={blocks} />
       <PostTags post={post} />
 
       <footer>
         <PostRelativeLink prevPost={prevPost} nextPost={nextPost} />
+        <Disqus />
       </footer>
+      <!-- ページトップに戻るボタン -->
+      <a class="pagetop" href="#"><div class="pagetop__arrow"></div></a>
     </div>
   </div>
 
-  <div slot="aside" class="aside">
+  <div slot="aside">
+    <TableOfContents blocks={blocks} />
     <BlogPostsLink
-      heading="Posts in the same category"
+      heading="同じタグの記事"
       posts={postsHavingSameTag.filter(
         (p: interfaces.Post) => p.Slug !== post.Slug
       )}
+      accentColor="#6366f1"
     />
-    <BlogPostsLink heading="Recommended" posts={rankedPosts} />
-    <BlogPostsLink heading="Latest posts" posts={recentPosts} />
-    <BlogTagsLink heading="Categories" tags={tags} />
+    <BlogPostsLink heading="おすすめ記事" posts={rankedPosts} accentColor="#f43f5e" />
+    <BlogPostsLink heading="最新記事" posts={recentPosts} accentColor="#3b82f6" />
+    <BlogTagsLink heading="タグ" tags={tags} />
   </div>
 </Layout>

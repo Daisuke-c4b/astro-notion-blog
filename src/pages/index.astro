@@ -6,14 +6,12 @@ import {
   getAllTags,
   getNumberOfPages,
 } from '../lib/notion/client.ts'
+import { getPostLink, filePath } from '../lib/blog-helpers.ts'
 import Layout from '../layouts/Layout.astro'
 import NoContents from '../components/NoContents.astro'
 import PostDate from '../components/PostDate.astro'
+import PostUpdateDate from '../components/PostUpdateDate.astro'
 import PostTags from '../components/PostTags.astro'
-import PostTitle from '../components/PostTitle.astro'
-import PostFeaturedImage from '../components/PostFeaturedImage.astro'
-import PostExcerpt from '../components/PostExcerpt.astro'
-import ReadMoreLink from '../components/ReadMoreLink.astro'
 import Pagination from '../components/Pagination.astro'
 import BlogPostsLink from '../components/BlogPostsLink.astro'
 import BlogTagsLink from '../components/BlogTagsLink.astro'
@@ -25,34 +23,122 @@ const [posts, rankedPosts, tags, numberOfPages] = await Promise.all([
   getAllTags(),
   getNumberOfPages(),
 ])
+
+function getImageSrc(post: any): string {
+  if (!post.FeaturedImage?.Url) return ''
+  if (import.meta.env.DEV) return post.FeaturedImage.Url
+  try {
+    return filePath(new URL(post.FeaturedImage.Url))
+  } catch {
+    return post.FeaturedImage.Url
+  }
+}
+
+const featuredPost = posts[0]
+const restPosts = posts.slice(1)
+const featuredImg = featuredPost ? getImageSrc(featuredPost) : ''
 ---
 
 <Layout>
   <div slot="main" class={styles.main}>
+    {posts.length === 0 && <NoContents contents={posts} />}
+
     {
-      posts.length === 0 ? (
-        <NoContents contents={posts} />
-      ) : (
-        posts.map((post) => (
-          <div class={styles.post} key={post.Slug}>
-            <PostDate post={post} />
-            <PostTags post={post} />
-            <PostTitle post={post} />
-            <PostFeaturedImage post={post} />
-            <PostExcerpt post={post} />
-            <ReadMoreLink post={post} />
+      featuredPost && (
+        <article class={styles.featured}>
+          <a
+            href={getPostLink(featuredPost.Slug)}
+            class={styles.featuredImage}
+            aria-hidden="true"
+            tabindex="-1"
+          >
+            {featuredImg ? (
+              <img src={featuredImg} alt="" loading="eager" />
+            ) : (
+              <div class={styles.cardPlaceholder}>
+                {featuredPost.Icon?.Type === 'emoji' ? featuredPost.Icon.Emoji : '📝'}
+              </div>
+            )}
+          </a>
+          <div class={styles.featuredBody}>
+            <span class="kicker">Featured</span>
+            <h2 class={styles.featuredTitle}>
+              <a href={getPostLink(featuredPost.Slug)}>
+                {featuredPost.Icon?.Type === 'emoji' && (
+                  <span class={styles.cardTitleIcon}>{featuredPost.Icon.Emoji}</span>
+                )}
+                {featuredPost.Title}
+              </a>
+            </h2>
+            {featuredPost.Excerpt && (
+              <p class={styles.featuredExcerpt}>{featuredPost.Excerpt}</p>
+            )}
+            <div class={styles.featuredMeta}>
+              <PostDate post={featuredPost} />
+              <PostUpdateDate post={featuredPost} />
+            </div>
+            <PostTags post={featuredPost} />
           </div>
-        ))
+        </article>
       )
     }
 
-    <footer>
+    {
+      restPosts.length > 0 && (
+        <div class={styles.sectionHead}>
+          <span class="kicker">最新の記事</span>
+        </div>
+      )
+    }
+
+    {
+      restPosts.length > 0 && (
+        <div class={styles.grid}>
+          {restPosts.map((post) => {
+            const imgSrc = getImageSrc(post)
+            return (
+              <article class={styles.card}>
+                <a href={getPostLink(post.Slug)} class={styles.cardImage} aria-hidden="true" tabindex="-1">
+                  {imgSrc ? (
+                    <img src={imgSrc} alt="" loading="lazy" />
+                  ) : (
+                    <div class={styles.cardPlaceholder}>
+                      {post.Icon?.Type === 'emoji' ? post.Icon.Emoji : '📝'}
+                    </div>
+                  )}
+                </a>
+                <div class={styles.cardBody}>
+                  <PostTags post={post} />
+                  <h2 class={styles.cardTitle}>
+                    <a href={getPostLink(post.Slug)}>
+                      {post.Icon?.Type === 'emoji' && (
+                        <span class={styles.cardTitleIcon}>{post.Icon.Emoji}</span>
+                      )}
+                      {post.Title}
+                    </a>
+                  </h2>
+                  <div class={styles.cardMeta}>
+                    <PostDate post={post} />
+                    <PostUpdateDate post={post} />
+                  </div>
+                  {post.Excerpt && (
+                    <p class={styles.cardExcerpt}>{post.Excerpt}</p>
+                  )}
+                </div>
+              </article>
+            )
+          })}
+        </div>
+      )
+    }
+
+    <footer class={styles.footer}>
       <Pagination currentPage={1} numberOfPages={numberOfPages} />
     </footer>
   </div>
 
-  <div slot="aside" class={styles.aside}>
-    <BlogPostsLink heading="Recommended" posts={rankedPosts} />
-    <BlogTagsLink heading="Categories" tags={tags} />
+  <div slot="aside">
+    <BlogPostsLink heading="おすすめ記事" posts={rankedPosts} />
+    <BlogTagsLink heading="タグ" tags={tags} />
   </div>
 </Layout>

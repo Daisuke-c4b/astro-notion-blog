@@ -13,52 +13,66 @@ const { heading, tags } = Astro.props
 ---
 
 <div class="blog-tags-link">
-  <h2>{heading}</h2>
+  <h2 class="section-heading">{heading}</h2>
   {
     tags.length === 0 ? (
       <NoContents contents={tags} />
     ) : (
-      <ul>
+      <div class="tags-wrap">
         {tags.map((tag: SelectProperty) => (
-          <li>
-            <a href={getTagLink(tag.name)} class={`tag ${tag.color}`}>
-              {tag.name}
-            </a>
-          </li>
+          <a href={getTagLink(tag.name)} class={`tag ${tag.color}`}>
+            {tag.name}
+          </a>
         ))}
-      </ul>
+      </div>
     )
   }
 </div>
 
 <style>
   .blog-tags-link {
+    margin-bottom: 24px;
   }
-  .blog-tags-link h2 {
-    margin: 0;
-    padding-left: 0.4rem;
-    color: #777;
-    font-size: 0.95rem;
+  .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: 0.02em;
   }
-  .blog-tags-link ul {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 0.3rem;
-    margin-block-end: 1rem;
+  .section-heading::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 14px;
+    background: #10b981;
+    border-radius: 2px;
+    flex-shrink: 0;
   }
-  .blog-tags-link ul li {
-    position: relative;
-    padding: 0.4rem;
-    line-height: 1.2rem;
-    font-size: 0.9rem;
+  .tags-wrap {
+    display: flex;
+    flex-wrap: wrap;
     gap: 6px;
   }
-  .blog-tags-link ul li a {
-    min-width: 0;
-    border-radius: 3px;
-    padding: 2px 6px;
-    line-height: 1.2;
-    color: rgb(50, 48, 44);
-    background: rgba(227, 226, 224, 0.5);
+  .tags-wrap a {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--fg);
+    background: var(--border);
+    white-space: nowrap;
+    transition: background 0.15s, opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+  }
+  .tags-wrap a:hover {
+    opacity: 0.85;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
   }
 </style>

@@ -4,6 +4,7 @@ import { getDatabase } from '../lib/notion/client.ts'
 import { getNavLink, getStaticFilePath, filePath } from '../lib/blog-helpers.ts'
 import '../styles/syntax-coloring.css'
 import GoogleAnalytics from '../components/GoogleAnalytics.astro'
+import Darkmode from '../components/Darkmode.astro'
 import SearchModal from '../components/SearchModal.astro'
 import SearchButton from '../components/SearchButton.astro'
 
@@ -33,8 +34,8 @@ if (database.Cover) {
   } else if (database.Cover.Type === 'file') {
     try {
       coverImageURL = filePath(new URL(database.Cover.Url))
-    } catch {
-      console.log('Invalid DB cover image URL: ', database.Cover?.Url)
+    } catch (err) {
+      console.log('Invalid DB cover image URL')
     }
   }
 }
@@ -43,8 +44,8 @@ let customIconURL: string
 if (database.Icon && database.Icon.Type === 'file') {
   try {
     customIconURL = filePath(new URL(database.Icon.Url))
-  } catch {
-    console.log('Invalid DB custom icon URL: ', database.Icon?.Url)
+  } catch (err) {
+    console.log('Invalid DB custom icon URL')
   }
 }
 ---
@@ -68,78 +69,95 @@ if (database.Icon && database.Icon.Type === 'file') {
     <meta name="twitter:description" content={siteDescription} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={ogImage || siteOGImage} />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Raleway:wght@700;800&family=Shippori+Mincho:wght@600;700;800&display=swap" rel="stylesheet">
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
       integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0"
       crossorigin="anonymous"
     />
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <meta name="google-site-verification" content="TUVhzTJvPtRImy_1HR0-cXqtymuqvACn-pS9DoNRiA4" />
   </head>
   <body>
     <GoogleAnalytics trackingId={PUBLIC_GA_TRACKING_ID} />
-    <div class="container">
-      <header>
+
+    <!-- Sticky top navigation bar -->
+    <nav class="site-topbar">
+      <a href={getNavLink('/')} class="topbar-logo">
         {
-          coverImageURL && (
-            <div class="cover">
-              <img src={coverImageURL} alt="Site cover image" loading="lazy" />
-            </div>
-          )
+          database.Icon && database.Icon.Type === 'emoji' ? (
+            <span class="logo-icon">{database.Icon.Emoji}</span>
+          ) : database.Icon && database.Icon.Type === 'external' ? (
+            <img src={database.Icon.Url} alt="Site icon" class="logo-img" />
+          ) : database.Icon && database.Icon.Type === 'file' ? (
+            <img src={customIconURL} alt="Site icon" class="logo-img custom-icon" />
+          ) : null
         }
-      </header>
+        <span class="logo-text">
+          {(() => {
+            const title = database.Title
+            const idx = title.indexOf('の')
+            if (idx < 0) return title
+            return (
+              <>
+                {title.slice(0, idx + 1)}
+                <br class="title-br" />
+                {title.slice(idx + 1)}
+              </>
+            )
+          })()}
+        </span>
+      </a>
+      <div class="topbar-controls">
+        <SearchButton />
+        <Darkmode />
+      </div>
+    </nav>
 
-      <div>
+    <div class="container">
+      <div class="content-wrap">
         <main>
-          <div class="content">
-            <header>
-              <h1>
-                <a href={getNavLink('/')}>
-                  {
-                    database.Icon && database.Icon.Type === 'emoji' ? (
-                      <>
-                        <span>{database.Icon.Emoji}</span>
-                        {database.Title}
-                      </>
-                    ) : database.Icon && database.Icon.Type === 'external' ? (
-                      <>
-                        <img src={database.Icon.Url} alt="Site icon image" />
-                        {database.Title}
-                      </>
-                    ) : database.Icon && database.Icon.Type === 'file' ? (
-                      <>
-                        <img
-                          src={customIconURL}
-                          class="custom-icon"
-                          alt="Site icon image"
-                        />
-                        {database.Title}
-                      </>
-                    ) : (
-                      database.Title
-                    )
-                  }
-                </a>
-              </h1>
-              <div class="description">
-                {database.Description}
+          {
+            coverImageURL && (
+              <div class="cover">
+                <img src={coverImageURL} alt="Site cover image" loading="lazy" />
               </div>
-            </header>
-
+            )
+          }
+          <div class="content">
             <slot name="main" />
-
             <footer>
               <div>
                 <span>Powered by&nbsp;</span>
-                <a href="https://github.com/otoyo/astro-notion-blog"
-                  >astro-notion-blog</a
-                >
+                <a href="https://github.com/otoyo/astro-notion-blog">astro-notion-blog</a>
               </div>
             </footer>
           </div>
         </main>
 
         <aside>
-          <SearchButton />
+          {database.Description && (
+            <p class="site-description">{database.Description}</p>
+          )}
+          <div class="social-icons">
+            <a href="/" aria-label="Home" title="Home">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15" fill="currentColor"><path d="M2 13.748c0 .138.112.25.25.25h3.749v-3h3v3h3.749a.25.25 0 0 0 .25-.25v-5.75H2zm11.93-7.17l-.932-.82V2a1 1 0 1 0-2 0v2L7.681 1.09a.25.25 0 0 0-.353-.011l-.011.011l-6.25 5.463a.25.25 0 0 0 .18.42L3 7h10.747a.25.25 0 0 0 .183-.421"/></svg>
+            </a>
+            <a href="https://www.youtube.com/@excelosarukun" aria-label="YouTube" title="YouTube" target="_blank" rel="noopener">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </a>
+            <a href="https://twitter.com/Excel_Osarukun" aria-label="X (Twitter)" title="X (Twitter)" target="_blank" rel="noopener">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07l-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z"/></svg>
+            </a>
+            <a href="https://www.instagram.com/excel_osarukun/" aria-label="Instagram" title="Instagram" target="_blank" rel="noopener">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </a>
+          </div>
           <slot name="aside" />
         </aside>
       </div>
@@ -155,118 +173,210 @@ if (database.Icon && database.Icon.Type === 'file') {
 </html>
 
 <style>
-  .container {
-    min-height: 100vh;
+  /* ===== Top navigation bar ===== */
+  .site-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    background: var(--topbar-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
   }
 
-  .container > div {
+  .topbar-logo {
     display: flex;
-    max-width: 1280px;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    transition: opacity 0.15s;
   }
-  @media (max-width: 640px) {
-    .container > div {
-      display: block;
+  .topbar-logo:hover { opacity: 0.75; }
+
+  .logo-icon {
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+  .logo-img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+  .logo-img.custom-icon {
+    border-radius: 6px;
+  }
+  .logo-text {
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: 'Raleway', 'Noto Sans JP', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  br.title-br { display: none; }
+  @media (max-width: 540px) {
+    .site-topbar {
+      height: auto;
+      min-height: 52px;
+      padding: 8px 14px;
+      align-items: center;
+    }
+    .topbar-logo {
+      flex: 1;
+      min-width: 0;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .logo-text {
+      white-space: normal;
+      font-size: 0.82rem;
+      line-height: 1.35;
+    }
+    br.title-br { display: block; }
+    .topbar-controls {
+      flex-shrink: 0;
+      align-self: center;
+    }
+  }
+
+  .topbar-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ===== Main layout ===== */
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    min-height: calc(100vh - 56px);
+  }
+
+  .content-wrap {
+    display: flex;
+    width: 100%;
+  }
+  @media (max-width: 768px) {
+    .content-wrap {
+      flex-direction: column;
     }
   }
 
   main {
     flex: 1;
-    order: 2;
-    justify-content: space-between;
-  }
-  @media (max-width: 640px) {
-    main {
-      order: 1;
-    }
+    order: 1;
+    min-width: 0;
   }
 
   aside {
-    order: 1;
-    width: 300px;
-    padding: 20px 20px;
-    background-color: #f4f4f4;
+    order: 2;
+    width: 256px;
+    flex-shrink: 0;
+    padding: 32px 20px;
+    border-left: 1px solid var(--border);
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
   }
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     aside {
       order: 2;
       width: 100%;
+      height: auto;
+      position: static;
+      border-left: none;
+      border-top: 1px solid var(--border);
+      padding: 20px 18px;
     }
   }
 
-  div.cover {
+  .site-description {
+    font-family: var(--font-serif);
+    font-size: 0.92rem;
+    color: var(--accents-2);
+    line-height: 1.75;
+    margin: 0 0 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
   }
+
+  /* ===== Social icons ===== */
+  .social-icons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    padding: 0 0 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .social-icons a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    color: var(--accents-1);
+    transition: background 0.15s, color 0.15s;
+  }
+  .social-icons a:hover {
+    background: var(--border);
+    color: var(--fg);
+    opacity: 1;
+  }
+  .social-icons svg {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+
+  /* ===== Cover image ===== */
   div.cover img {
     display: block;
     width: 100%;
-    height: 20vh;
+    height: auto;
+    max-height: 400px;
     object-fit: cover;
     object-position: center 60%;
   }
 
+  /* ===== Main content area ===== */
   div.content {
-    padding: 20px 40px;
+    padding: 40px 48px;
+    width: 100%;
+    min-width: 0;
   }
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     div.content {
-      padding: 0 18px;
+      padding: 24px 18px;
     }
-  }
-
-  main header {
-    padding: 20px 0 20px;
-  }
-  main header h1 {
-    font-weight: 700;
-    color: #333;
-  }
-  main header h1 a {
-    display: block;
-    color: inherit;
-  }
-  main header h1 a:hover {
-    color: inherit;
-  }
-  main header h1 a span,
-  main header h1 a img {
-    display: inline-block;
-    font-size: 1.1em;
-  }
-  main header h1 a span {
-    margin-right: 0.3em;
-    margin-left: -0.1rem;
-  }
-  main header h1 a img {
-    width: 1.2em;
-    height: 1.2em;
-    margin-right: 0.2em;
-    margin-left: -0.3rem;
-    vertical-align: sub;
-  }
-  main header h1 a img.custom-icon {
-    border-radius: var(--radius);
-  }
-
-  main header div.description {
-    padding: 0.3rem 0 0.6rem;
-    font-size: 0.95rem;
   }
 
   main footer {
-    margin: 30px 0 10px;
+    margin: 56px 0 16px;
     text-align: center;
     font-size: 0.75rem;
-  }
-  @media (max-width: 640px) {
-    main footer {
-      margin: 0 auto 30px;
-    }
-  }
-  main footer span {
-    color: #777;
+    color: var(--accents-3);
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
   }
   main footer a {
     color: inherit;
     text-decoration: underline;
+    text-underline-offset: 2px;
   }
 </style>
 
@@ -277,21 +387,28 @@ if (database.Icon && database.Icon.Type === 'file') {
     --gap: 1rem;
     --gap-double: 2rem;
 
-    --bg: #fff;
-    --fg: #333;
-    --accents-1: #666;
-    --accents-2: #666;
-    --accents-3: #666;
+    --bg: #F8F8F6;
+    --fg: #111111;
+    --accents-1: #333333;
+    --accents-2: #555555;
+    --accents-3: #999999;
     --geist-foreground: #000;
-    --geist-success: #690;
+    --geist-success: #059669;
 
-    --radius: 4px;
+    --radius: 10px;
+    --border: #E6E6E2;
+    --card-bg: #ffffff;
+    --topbar-bg: rgba(250, 250, 248, 0.88);
+    --shadow: 0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
 
-    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-      'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
-      'Helvetica Neue', sans-serif;
-    --font-mono: SFMono-Regular, Menlo, Consolas, 'PT Mono', 'Liberation Mono',
-      Courier, monospace;
+    --font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-serif: 'Playfair Display', 'Shippori Mincho', 'Noto Serif JP', serif;
+    --font-mono: SFMono-Regular, Menlo, Consolas, 'PT Mono', 'Liberation Mono', Courier, monospace;
+
+    /* Editorial signature accent */
+    --accent: #b23a2e;
+    --accent-weak: rgba(178, 58, 46, 0.1);
   }
 
   * {
@@ -310,42 +427,33 @@ if (database.Icon && database.Icon.Type === 'file') {
     min-height: 100vh;
     background: var(--bg);
     color: var(--fg);
-    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-      Helvetica, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN',
-      'Hiragino Sans GB', メイリオ, Meiryo, 'Apple Color Emoji', Arial,
-      sans-serif, 'Segoe UI Emoji', 'Segoe UI Symbol';
-
-    /*background-image: radial-gradient(#ddd 1px, transparent 1px),
-      radial-gradient(#ddd 1px, transparent 1px);*/
-    background-position: 0 0, 25px 25px;
-    background-attachment: fixed;
-    background-size: 50px 50px;
-
-    /* Hack */
+    font-family: var(--font-sans);
     overflow-x: hidden;
-
     -webkit-font-smoothing: antialiased;
     -webkit-text-size-adjust: 100%;
+    line-height: 1.7;
   }
 
   figure {
     margin: 0;
     font-size: 0.85rem;
-    color: #999;
+    color: var(--accents-3);
     line-height: 1.8rem;
   }
 
   a {
     color: var(--accents-1);
     text-decoration: none;
+    transition: opacity 0.15s;
   }
   a:hover {
     color: var(--accents-1);
+    opacity: 0.75;
   }
 
   mark {
     padding: var(--gap-quarter);
-    border-radius: var(--radius);
+    border-radius: 4px;
     background: rgba(247, 212, 255, 0.8);
   }
 
@@ -354,32 +462,55 @@ if (database.Icon && database.Icon.Type === 'file') {
     color: var(--fg);
     font-size: 2rem;
     font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  @media (max-width: 768px) {
+    h1 { font-size: 1.5rem; }
   }
 
-  @media (max-width: 640px) {
-    h1 {
-      font-size: 1.6rem;
-    }
+  h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.35;
+    margin: 2.5rem 0 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--fg);
+  }
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 2rem 0 0.5rem;
+    color: var(--accents-1);
+  }
+  h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 1.5rem 0 0.5rem;
+    color: var(--accents-2);
   }
 
   ol {
-    color: #222;
+    color: var(--fg);
     font-weight: 400;
-    font-size: 0.9rem;
-    line-height: 1.8rem;
+    font-size: 0.95rem;
+    line-height: 1.9;
   }
-  p,
-  ul {
-    color: #222;
+  p, ul {
+    color: var(--fg);
     font-weight: 400;
     font-size: 1rem;
-    line-height: 1.8rem;
+    line-height: 1.9;
   }
-  ul,
-  ol {
-    margin: 0;
+  ul, ol {
+    margin: 5px;
     padding-inline-start: 1.5rem;
   }
+
   pre {
     margin: 0;
     white-space: pre;
@@ -395,15 +526,15 @@ if (database.Icon && database.Icon.Type === 'file') {
     height: 1px;
     border: 0;
     margin: 0.3rem 0;
-    background-color: #333;
+    background-color: var(--border);
   }
 
   code {
-    font-size: 0.9rem;
-    background: rgba(135, 131, 120, 0.15);
-    color: #eb5757;
-    padding: 0.25rem;
-    border-radius: var(--radius);
+    font-size: 0.88rem;
+    background: var(--border);
+    color: var(--accents-1);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
     font-family: var(--font-mono);
   }
 
@@ -413,27 +544,74 @@ if (database.Icon && database.Icon.Type === 'file') {
     white-space: nowrap;
     border-collapse: collapse;
   }
-
-  table tr {
-    vertical-align: top;
-  }
-
+  table tr { vertical-align: top; }
   table th {
-    font-weight: 600;
-    background-color: #f4f4f4;
+    font-weight: 700;
+    background-color: var(--border);
   }
-
-  table td,
-  table th {
+  table td, table th {
     font-size: 0.9rem;
-    border: 1px solid #e4e4e4;
+    border: 1px solid var(--border);
     padding: 0.5rem 1rem;
     text-align: left;
-    line-height: 1.2rem;
+    line-height: 1.4;
   }
   table td::after {
     content: '';
     display: inline-block;
     min-height: 0.9rem;
   }
+
+  /* ===== Editorial helpers ===== */
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    line-height: 1.2;
+  }
+  .kicker::before {
+    content: '';
+    width: 1.6em;
+    height: 2px;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* ページトップに戻るボタン */
+  .pagetop {
+    height: 44px;
+    width: 44px;
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    background: var(--fg);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+    box-shadow: var(--shadow);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .pagetop__arrow {
+    height: 9px;
+    width: 9px;
+    border-top: 2px solid var(--bg);
+    border-right: 2px solid var(--bg);
+    transform: translateY(20%) rotate(-45deg);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pagetop:hover {
+      opacity: 0.8;
+      transform: translateY(-2px);
+    }
+  }
+
+  /* --topbar-bg variable handles dark mode switching */
 </style>
