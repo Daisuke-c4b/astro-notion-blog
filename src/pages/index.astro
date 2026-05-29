@@ -33,16 +33,68 @@ function getImageSrc(post: any): string {
     return post.FeaturedImage.Url
   }
 }
+
+const featuredPost = posts[0]
+const restPosts = posts.slice(1)
+const featuredImg = featuredPost ? getImageSrc(featuredPost) : ''
 ---
 
 <Layout>
   <div slot="main" class={styles.main}>
+    {posts.length === 0 && <NoContents contents={posts} />}
+
     {
-      posts.length === 0 ? (
-        <NoContents contents={posts} />
-      ) : (
+      featuredPost && (
+        <article class={styles.featured}>
+          <a
+            href={getPostLink(featuredPost.Slug)}
+            class={styles.featuredImage}
+            aria-hidden="true"
+            tabindex="-1"
+          >
+            {featuredImg ? (
+              <img src={featuredImg} alt="" loading="eager" />
+            ) : (
+              <div class={styles.cardPlaceholder}>
+                {featuredPost.Icon?.Type === 'emoji' ? featuredPost.Icon.Emoji : '📝'}
+              </div>
+            )}
+          </a>
+          <div class={styles.featuredBody}>
+            <span class="kicker">Featured</span>
+            <h2 class={styles.featuredTitle}>
+              <a href={getPostLink(featuredPost.Slug)}>
+                {featuredPost.Icon?.Type === 'emoji' && (
+                  <span class={styles.cardTitleIcon}>{featuredPost.Icon.Emoji}</span>
+                )}
+                {featuredPost.Title}
+              </a>
+            </h2>
+            {featuredPost.Excerpt && (
+              <p class={styles.featuredExcerpt}>{featuredPost.Excerpt}</p>
+            )}
+            <div class={styles.featuredMeta}>
+              <PostDate post={featuredPost} />
+              <PostUpdateDate post={featuredPost} />
+            </div>
+            <PostTags post={featuredPost} />
+          </div>
+        </article>
+      )
+    }
+
+    {
+      restPosts.length > 0 && (
+        <div class={styles.sectionHead}>
+          <span class="kicker">最新の記事</span>
+        </div>
+      )
+    }
+
+    {
+      restPosts.length > 0 && (
         <div class={styles.grid}>
-          {posts.map((post) => {
+          {restPosts.map((post) => {
             const imgSrc = getImageSrc(post)
             return (
               <article class={styles.card}>
